@@ -42,6 +42,7 @@
 
 # Project
 .vscode/settings.json
+.vscode/c_cpp_properties.json
 build
 managed_components
 

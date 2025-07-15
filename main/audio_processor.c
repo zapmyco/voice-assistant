@@ -68,7 +68,7 @@
 /* Audio volume setting */
 #define DEFAULT_PLAYBACK_VOLUME     (70)
 #define DEFAULT_RECORD_DB           (50.0)
-#define DEFAULT_RECOPRD_REF_DB      (50.0)
+#define DEFAULT_RECORD_REF_DB       (50.0)
 #define DEFAULT_WAKEUP_END_TIME_MS  (60000)
 
 #if defined CONFIG_UPLOAD_FORMAT_G711A || defined CONFIG_UPLOAD_FORMAT_G711U \
@@ -97,7 +97,7 @@
 #include <errno.h>
 #include "esp_timer.h"
 
-#define AEC_DEBUDG_FILE_NAME "/sdcard/rec3.pcm"
+#define AEC_DEBUG_FILE_NAME "/sdcard/rec3.pcm"
 #define AEC_RECORD_TIME       (30)  // s
 
 static bool    record_flag = true;
@@ -129,7 +129,7 @@ typedef struct {
     esp_gmf_afe_manager_handle_t  afe_manager;
     afe_config_t                 *afe_cfg;
 #endif  /* CONFIG_KEY_PRESS_DIALOG_MODE */
-} audio_recordert_t;
+} audio_recorder_t;
 
 typedef struct {
     esp_gmf_pipeline_handle_t pipe;
@@ -146,7 +146,7 @@ typedef struct {
 } audio_manager_t;
 
 static audio_manager_t   audio_manager;
-static audio_recordert_t audio_recorder;
+static audio_recorder_t audio_recorder;
 static audio_playback_t  audio_playback;
 static audio_prompt_t    audio_prompt;
 
@@ -155,7 +155,7 @@ static void aec_debug_data_write(char *data, int len)
 {
     if (record_flag) {
         if (file_fd == -1) {
-            file_fd = open(AEC_DEBUDG_FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+            file_fd = open(AEC_DEBUG_FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0666);
             if (file_fd == -1) {
                 ESP_LOGI(TAG, "Cannot open file, reason: %s\n", strerror(errno));
                 return;
@@ -167,7 +167,7 @@ static void aec_debug_data_write(char *data, int len)
             record_flag = false;
             close(file_fd);
             file_fd = -1;
-            ESP_LOGI(TAG, "AEC debug data write done, file: %s", AEC_DEBUDG_FILE_NAME);
+            ESP_LOGI(TAG, "AEC debug data write done, file: %s", AEC_DEBUG_FILE_NAME);
         }
     }
 }
@@ -231,7 +231,7 @@ esp_err_t audio_manager_init(void)
     ret = esp_codec_dev_set_in_gain(audio_manager.rec_dev, DEFAULT_RECORD_DB);
     ESP_GMF_RET_ON_NOT_OK(TAG, ret, { ESP_LOGW(TAG, "Failed to set record volume, continuing..."); }, "Failed to set record volume");
 
-    esp_codec_dev_set_in_channel_gain(audio_manager.rec_dev, BOARD_CODEC_REF_MIC, DEFAULT_RECOPRD_REF_DB);
+    esp_codec_dev_set_in_channel_gain(audio_manager.rec_dev, BOARD_CODEC_REF_MIC, DEFAULT_RECORD_REF_DB);
     audio_recorder.state = AUDIO_RUN_STATE_CLOSED;
     audio_playback.state = AUDIO_RUN_STATE_CLOSED;
     audio_prompt.state = AUDIO_RUN_STATE_CLOSED;
