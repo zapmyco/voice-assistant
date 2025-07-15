@@ -39,3 +39,9 @@
 
 # debug information files
 *.dwo
+
+# Project
+.vscode/settings.json
+build
+managed_components
+
